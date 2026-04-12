@@ -4,6 +4,8 @@ Mini GPT is a lightweight AI assistant built using a fine-tuned Large Language M
 It can answer theoretical questions, perform calculations, and maintain conversational context.
 
 ---
+Live Demo: https://mini-gpt-aulrbrkjszlw6fhrtv7re2.streamlit.app/
+Note: The live demo may respond slowly due to limited compute resources. For the best performance, please run the project locally using the steps below.
 
 ##  Features
 

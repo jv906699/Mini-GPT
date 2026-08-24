@@ -1,0 +1,14 @@
+[
+    {
+        "text": "### Instruction:\nUser asks factual question\n\n### Input:\nWhat is the capital of France?\n\n### Response:\nGeneral knowledge agent answers: Paris"
+    },
+    {
+        "text": "### Instruction:\nUser asks to write code\n\n### Input:\nWrite Python code for factorial\n\n### Response:\nCoding agent generates factorial function"
+    },
+    {
+        "text": "### Instruction:\nUser asks for summarization\n\n### Input:\nSummarize this paragraph about AI\n\n### Response:\nSummarization agent produces short summary"
+    },
+    {
+        "text": "### Instruction:\nUser asks for task planning\n\n### Input:\nPlan a trip to Goa\n\n### Response:\nPlanner agent breaks into steps: booking, itinerary, budget"
+    }
+]

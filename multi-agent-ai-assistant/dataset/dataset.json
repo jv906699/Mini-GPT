@@ -1,0 +1,22 @@
+[
+  {
+    "instruction": "User asks factual question",
+    "input": "What is the capital of France?",
+    "output": "General knowledge agent answers: Paris"
+  },
+  {
+    "instruction": "User asks to write code",
+    "input": "Write Python code for factorial",
+    "output": "Coding agent generates factorial function"
+  },
+  {
+    "instruction": "User asks for summarization",
+    "input": "Summarize this paragraph about AI",
+    "output": "Summarization agent produces short summary"
+  },
+  {
+    "instruction": "User asks for task planning",
+    "input": "Plan a trip to Goa",
+    "output": "Planner agent breaks into steps: booking, itinerary, budget"
+  }
+]

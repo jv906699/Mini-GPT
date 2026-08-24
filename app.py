@@ -1,41 +1,72 @@
 import streamlit as st
 import numpy as np
+import torch
 from peft import PeftModel
 
-# ---------------------------
-# 🔹 Load LLM (cached)
-# ---------------------------
-@st.cache_resource
+
+# ============================================================
+# MINI GPT
+# TinyLlama 1.1B + LoRA + RAG + Multi-Agent Routing
+# ============================================================
+
+
+# ------------------------------------------------------------
+# Load Fine-Tuned LLM
+# ------------------------------------------------------------
+@st.cache_resource(show_spinner="Loading Mini GPT model...")
 def load_llm():
-    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
+    from transformers import (
+        AutoTokenizer,
+        AutoModelForCausalLM,
+        pipeline
+    )
 
     base_model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+    adapter_model = "jatin-verma-ai/intelliagent-model"
 
     tokenizer = AutoTokenizer.from_pretrained(base_model)
-    model = AutoModelForCausalLM.from_pretrained(base_model)
+
+    model = AutoModelForCausalLM.from_pretrained(
+        base_model
+    )
+
+    # Load your trained LoRA adapter
     model = PeftModel.from_pretrained(
-    model,
-    "jatin-verma-ai/intelliagent-model"
-)
+        model,
+        adapter_model
+    )
+
+    # Inference mode
+    model.eval()
 
     pipe = pipeline(
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        max_new_tokens=120,
-        temperature=0.6,
+
+        # Faster generation
+        max_new_tokens=60,
+
+        # Deterministic generation
         do_sample=False,
-        repetition_penalty=1.2
+
+        # Prevent unnecessary repetition
+        repetition_penalty=1.1,
+
+        # Don't return the original prompt
+        return_full_text=False
     )
 
     return pipe
 
 
-# ---------------------------
-# 🔹 Load RAG (cached)
-# ---------------------------
-@st.cache_resource
+# ------------------------------------------------------------
+# Load RAG System
+# ------------------------------------------------------------
+@st.cache_resource(show_spinner="Loading RAG system...")
 def load_rag():
+
     from sentence_transformers import SentenceTransformer
     import faiss
 
@@ -46,111 +77,248 @@ def load_rag():
         "Machine learning is a method where computers learn patterns from data."
     ]
 
-    embed_model = SentenceTransformer("all-MiniLM-L6-v2")
-    embeddings = embed_model.encode(documents)
+    # Embedding model
+    embed_model = SentenceTransformer(
+        "all-MiniLM-L6-v2"
+    )
 
-    index = faiss.IndexFlatL2(embeddings.shape[1])
-    index.add(np.array(embeddings))
+    embeddings = embed_model.encode(
+        documents,
+        convert_to_numpy=True
+    )
+
+    # FAISS vector index
+    index = faiss.IndexFlatL2(
+        embeddings.shape[1]
+    )
+
+    index.add(
+        embeddings.astype("float32")
+    )
 
     return embed_model, index, documents
 
 
-# ---------------------------
-# 🔹 Tools (Agents)
-# ---------------------------
+# ------------------------------------------------------------
+# Calculator Agent
+# ------------------------------------------------------------
 def calculator_tool(query):
+
     try:
-        return str(eval(query))
-    except:
-        return "⚠️ Calculation error"
+        # Extract a simple mathematical expression
+        expression = query.lower()
+
+        expression = (
+            expression
+            .replace("calculate", "")
+            .replace("what is", "")
+            .replace("=", "")
+            .strip()
+        )
+
+        # Basic calculator
+        result = eval(
+            expression,
+            {"__builtins__": {}},
+            {}
+        )
+
+        return str(result)
+
+    except Exception:
+        return "⚠️ I couldn't calculate that expression."
 
 
+# ------------------------------------------------------------
+# Query Router
+# ------------------------------------------------------------
 def route_query(query):
-    q = query.lower()
 
-    if any(x in q for x in ["+", "-", "*", "/", "calculate"]):
+    q = query.lower().strip()
+
+    # Calculator
+    math_words = [
+        "calculate",
+        "plus",
+        "minus",
+        "multiply",
+        "divide"
+    ]
+
+    math_symbols = ["+", "*", "/"]
+
+    if (
+        any(word in q for word in math_words)
+        or any(symbol in q for symbol in math_symbols)
+    ):
         return "calculator"
-    elif any(x in q for x in ["what", "explain", "define", "why", "how"]):
+
+    # RAG
+    rag_words = [
+        "what is",
+        "what are",
+        "explain",
+        "define",
+        "why",
+        "how does",
+        "how do"
+    ]
+
+    if any(word in q for word in rag_words):
         return "rag"
-    else:
-        return "llm"
+
+    # General LLM
+    return "llm"
 
 
-# ---------------------------
-# 🔹 Retrieve function
-# ---------------------------
-def retrieve(query, embed_model, index, documents):
-    q = embed_model.encode([query])
-    _, idx = index.search(np.array(q), 2)
-    return "\n".join([documents[i] for i in idx[0]])
+# ------------------------------------------------------------
+# RAG Retrieval
+# ------------------------------------------------------------
+def retrieve(
+    query,
+    embed_model,
+    index,
+    documents
+):
+
+    query_embedding = embed_model.encode(
+        [query],
+        convert_to_numpy=True
+    )
+
+    query_embedding = query_embedding.astype(
+        "float32"
+    )
+
+    _, indices = index.search(
+        query_embedding,
+        1
+    )
+
+    return documents[indices[0][0]]
 
 
-# ---------------------------
-# 🔹 Clean output
-# ---------------------------
+# ------------------------------------------------------------
+# Clean Model Output
+# ------------------------------------------------------------
 def clean_output(text):
-    if "Answer:" in text:
-        text = text.split("Answer:")[-1]
 
-    unwanted = ["Context:", "You are a helpful AI assistant"]
-    for u in unwanted:
-        text = text.replace(u, "")
+    unwanted = [
+        "Context:",
+        "You are a helpful AI assistant",
+        "Answer:",
+        "Question:",
+        "Use the context only if useful"
+    ]
+
+    for item in unwanted:
+        text = text.replace(item, "")
 
     return text.strip()
 
 
-# ---------------------------
-# 🔹 Load models
-# ---------------------------
+# ------------------------------------------------------------
+# Load Resources
+# ------------------------------------------------------------
 pipe = load_llm()
+
 embed_model, index, documents = load_rag()
 
 
-# ---------------------------
-# 🔹 Chat Memory
-# ---------------------------
+# ------------------------------------------------------------
+# Chat Memory
+# ------------------------------------------------------------
 if "messages" not in st.session_state:
+
     st.session_state.messages = []
 
 
-# ---------------------------
-# 🔹 UI
-# ---------------------------
+# ------------------------------------------------------------
+# UI
+# ------------------------------------------------------------
 st.title("🤖 Mini GPT")
 
-# Show chat history
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.write(msg["content"])
+st.caption(
+    "TinyLlama 1.1B + LoRA + RAG + Multi-Agent Routing"
+)
 
-# Chat input
+
+# ------------------------------------------------------------
+# Display Previous Chat History
+# ------------------------------------------------------------
+for message in st.session_state.messages:
+
+    with st.chat_message(message["role"]):
+
+        st.write(message["content"])
+
+
+# ------------------------------------------------------------
+# Chat Input
+# ------------------------------------------------------------
 query = st.chat_input("Ask something...")
 
+
+# ------------------------------------------------------------
+# Process New Query
+# ------------------------------------------------------------
 if query:
-    # Store user message
-    st.session_state.messages.append({"role": "user", "content": query})
 
-    # 🔥 Build conversation context (last 5 messages)
+    # Show the user's question immediately
+    with st.chat_message("user"):
+        st.write(query)
+
+    # Save user message
+    st.session_state.messages.append(
+        {
+            "role": "user",
+            "content": query
+        }
+    )
+
+
+    # --------------------------------------------------------
+    # Keep recent conversation
+    # --------------------------------------------------------
+    recent_messages = st.session_state.messages[-2:]
+
     conversation = ""
-    for msg in st.session_state.messages[-5:]:
-        conversation += f"{msg['role']}: {msg['content']}\n"
 
-    # 🔥 Route query
+    for message in recent_messages:
+
+        conversation += (
+            f"{message['role']}: "
+            f"{message['content']}\n"
+        )
+
+
+    # --------------------------------------------------------
+    # Route Query
+    # --------------------------------------------------------
     agent = route_query(query)
 
+
+    # --------------------------------------------------------
+    # Calculator Agent
+    # --------------------------------------------------------
     if agent == "calculator":
+
         answer = calculator_tool(query)
 
+
+    # --------------------------------------------------------
+    # RAG Agent
+    # --------------------------------------------------------
     elif agent == "rag":
-        context = retrieve(query, embed_model, index, documents)
 
-        prompt = f"""
-You are a helpful AI assistant.
+        context = retrieve(
+            query,
+            embed_model,
+            index,
+            documents
+        )
 
-Conversation:
-{conversation}
-
-Use the context only if useful.
+        prompt = f"""Answer the question briefly.
 
 Context:
 {context}
@@ -158,26 +326,59 @@ Context:
 Question:
 {query}
 
-Answer:
-"""
-        result = pipe(prompt)[0]["generated_text"]
-        answer = clean_output(result)
+Answer:"""
 
+        with st.spinner("Thinking..."):
+
+            with torch.inference_mode():
+
+                result = pipe(prompt)
+
+        answer = clean_output(
+            result[0]["generated_text"]
+        )
+
+
+    # --------------------------------------------------------
+    # General LLM Agent
+    # --------------------------------------------------------
     else:
-        prompt = f"""
+
+        prompt = f"""Answer the user briefly and clearly.
+
 Conversation:
 {conversation}
 
-Question:
+User:
 {query}
 
-Answer:
-"""
-        result = pipe(prompt)[0]["generated_text"]
-        answer = clean_output(result)
+Assistant:"""
 
-    # Store assistant response
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+        with st.spinner("Thinking..."):
 
+            with torch.inference_mode():
+
+                result = pipe(prompt)
+
+        answer = clean_output(
+            result[0]["generated_text"]
+        )
+
+
+    # --------------------------------------------------------
+    # Save Assistant Response
+    # --------------------------------------------------------
+    st.session_state.messages.append(
+        {
+            "role": "assistant",
+            "content": answer
+        }
+    )
+
+
+    # --------------------------------------------------------
+    # Display Assistant Response Immediately
+    # --------------------------------------------------------
     with st.chat_message("assistant"):
+
         st.write(answer)

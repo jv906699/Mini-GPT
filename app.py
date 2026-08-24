@@ -1,21 +1,20 @@
+import re
 import streamlit as st
 import numpy as np
-import torch
 from peft import PeftModel
 
 
 # ============================================================
-# MINI GPT
+# Mini GPT
 # TinyLlama 1.1B + LoRA + RAG + Multi-Agent Routing
 # ============================================================
 
 
 # ------------------------------------------------------------
-# Load Fine-Tuned LLM
+# Load LLM
 # ------------------------------------------------------------
-@st.cache_resource(show_spinner="Loading Mini GPT model...")
+@st.cache_resource
 def load_llm():
-
     from transformers import (
         AutoTokenizer,
         AutoModelForCausalLM,
@@ -23,58 +22,135 @@ def load_llm():
     )
 
     base_model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-    adapter_model = "jatin-verma-ai/intelliagent-model"
 
-    tokenizer = AutoTokenizer.from_pretrained(base_model)
+    tokenizer = AutoTokenizer.from_pretrained(
+        base_model
+    )
 
     model = AutoModelForCausalLM.from_pretrained(
         base_model
     )
 
-    # Load your trained LoRA adapter
+    # Load your fine-tuned LoRA adapter
     model = PeftModel.from_pretrained(
         model,
-        adapter_model
+        "jatin-verma-ai/intelliagent-model"
     )
-
-    # Inference mode
-    model.eval()
 
     pipe = pipeline(
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-
-        # Faster generation
-        max_new_tokens=60,
-
-        # Deterministic generation
+        max_new_tokens=120,
+        temperature=0.6,
         do_sample=False,
-
-        # Prevent unnecessary repetition
-        repetition_penalty=1.1,
-
-        # Don't return the original prompt
-        return_full_text=False
+        repetition_penalty=1.2
     )
 
     return pipe
 
 
 # ------------------------------------------------------------
-# Load RAG System
+# Load RAG Knowledge Base
 # ------------------------------------------------------------
-@st.cache_resource(show_spinner="Loading RAG system...")
+@st.cache_resource
 def load_rag():
-
     from sentence_transformers import SentenceTransformer
     import faiss
 
+    # Small demonstration knowledge base
     documents = [
-        "Gradient descent is an optimization algorithm used to minimize loss.",
-        "Overfitting occurs when a model learns training data too well and fails on new data.",
-        "Neural networks are inspired by the human brain and consist of layers of neurons.",
-        "Machine learning is a method where computers learn patterns from data."
+        (
+            "Artificial Intelligence (AI) is a field of computer "
+            "science focused on building systems that can perform "
+            "tasks that normally require human intelligence, such "
+            "as reasoning, learning, perception, and language "
+            "understanding."
+        ),
+
+        (
+            "Machine learning is a branch of artificial intelligence "
+            "in which computer systems learn patterns from data and "
+            "use those patterns to make predictions or decisions."
+        ),
+
+        (
+            "Gradient descent is an optimization algorithm commonly "
+            "used to minimize a machine learning model's loss "
+            "function by iteratively adjusting model parameters "
+            "in the direction that reduces the loss."
+        ),
+
+        (
+            "Overfitting occurs when a machine learning model learns "
+            "the training data too closely, including noise or "
+            "irrelevant patterns, and therefore performs poorly "
+            "on previously unseen data."
+        ),
+
+        (
+            "Neural networks are machine learning models composed "
+            "of interconnected layers of artificial neurons. "
+            "They can learn complex relationships in data and are "
+            "widely used in computer vision, natural language "
+            "processing, and other AI applications."
+        ),
+
+        (
+            "Retrieval-Augmented Generation (RAG) is a technique "
+            "that combines information retrieval with language "
+            "model generation. A RAG system first retrieves relevant "
+            "information from an external knowledge base and then "
+            "provides that information to a language model as "
+            "context for generating an answer."
+        ),
+
+        (
+            "FAISS is a library for efficient similarity search "
+            "and clustering of dense vectors. In this project, "
+            "FAISS stores document embeddings and retrieves the "
+            "documents whose vectors are most similar to a user's "
+            "query embedding."
+        ),
+
+        (
+            "Sentence Transformers are models used to convert "
+            "sentences or documents into numerical vector "
+            "embeddings. In this project, Sentence Transformers "
+            "create embeddings for the RAG knowledge base and "
+            "for user queries."
+        ),
+
+        (
+            "LoRA, or Low-Rank Adaptation, is a parameter-efficient "
+            "fine-tuning technique. Instead of updating all the "
+            "parameters of a language model, LoRA trains a smaller "
+            "set of additional parameters that can be loaded as "
+            "an adapter."
+        ),
+
+        (
+            "TinyLlama 1.1B is a lightweight language model with "
+            "approximately 1.1 billion parameters. In this project, "
+            "TinyLlama/TinyLlama-1.1B-Chat-v1.0 is used as the base "
+            "language model together with a LoRA adapter."
+        ),
+
+        (
+            "Multi-agent routing is an approach in which a user's "
+            "query is analyzed and directed to a specialized "
+            "agent or tool. In this project, queries are routed "
+            "between a general LLM agent, a RAG agent, and a "
+            "calculator agent."
+        ),
+
+        (
+            "The Mini GPT project combines a fine-tuned TinyLlama "
+            "language model, LoRA, Retrieval-Augmented Generation "
+            "using Sentence Transformers and FAISS, a calculator "
+            "tool, conversational memory, and Streamlit to provide "
+            "a lightweight AI assistant."
+        )
     ]
 
     # Embedding model
@@ -82,21 +158,30 @@ def load_rag():
         "all-MiniLM-L6-v2"
     )
 
+    # Generate embeddings
     embeddings = embed_model.encode(
         documents,
         convert_to_numpy=True
     )
 
-    # FAISS vector index
+    embeddings = embeddings.astype(
+        np.float32
+    )
+
+    # Create FAISS index
     index = faiss.IndexFlatL2(
         embeddings.shape[1]
     )
 
     index.add(
-        embeddings.astype("float32")
+        embeddings
     )
 
-    return embed_model, index, documents
+    return (
+        embed_model,
+        index,
+        documents
+    )
 
 
 # ------------------------------------------------------------
@@ -105,18 +190,32 @@ def load_rag():
 def calculator_tool(query):
 
     try:
-        # Extract a simple mathematical expression
-        expression = query.lower()
+        expression = query.lower().strip()
 
-        expression = (
+        # Remove common calculation phrases
+        expression = re.sub(
+            r"\b(calculate|compute)\b",
+            "",
             expression
-            .replace("calculate", "")
-            .replace("what is", "")
-            .replace("=", "")
-            .strip()
-        )
+        ).strip()
 
-        # Basic calculator
+        # Handle "what is 25 * 16"
+        expression = re.sub(
+            r"^what\s+is\s+",
+            "",
+            expression
+        ).strip()
+
+        # Only allow basic arithmetic
+        if not re.fullmatch(
+            r"[0-9+\-*/().\s]+",
+            expression
+        ):
+            return (
+                "⚠️ I can calculate basic arithmetic "
+                "expressions only."
+            )
+
         result = eval(
             expression,
             {"__builtins__": {}},
@@ -126,7 +225,7 @@ def calculator_tool(query):
         return str(result)
 
     except Exception:
-        return "⚠️ I couldn't calculate that expression."
+        return "⚠️ Calculation error."
 
 
 # ------------------------------------------------------------
@@ -136,43 +235,45 @@ def route_query(query):
 
     q = query.lower().strip()
 
-    # Calculator
-    math_words = [
-        "calculate",
-        "plus",
-        "minus",
-        "multiply",
-        "divide"
-    ]
+    # Detect actual arithmetic expressions
+    arithmetic_pattern = (
+        r"^\s*"
+        r"(?:calculate|compute|what\s+is)?"
+        r"\s*"
+        r"[0-9]+(?:\s*[+\-*/]\s*[0-9().]+)+"
+        r"\s*$"
+    )
 
-    math_symbols = ["+", "*", "/"]
-
-    if (
-        any(word in q for word in math_words)
-        or any(symbol in q for symbol in math_symbols)
+    if re.fullmatch(
+        arithmetic_pattern,
+        q
     ):
         return "calculator"
 
-    # RAG
-    rag_words = [
+    # Questions that benefit from the RAG knowledge base
+    rag_keywords = [
         "what is",
         "what are",
         "explain",
         "define",
         "why",
         "how does",
-        "how do"
+        "how do",
+        "tell me about"
     ]
 
-    if any(word in q for word in rag_words):
+    if any(
+        keyword in q
+        for keyword in rag_keywords
+    ):
         return "rag"
 
-    # General LLM
+    # Everything else goes to the general LLM
     return "llm"
 
 
 # ------------------------------------------------------------
-# RAG Retrieval
+# Retrieve relevant documents
 # ------------------------------------------------------------
 def retrieve(
     query,
@@ -187,42 +288,101 @@ def retrieve(
     )
 
     query_embedding = query_embedding.astype(
-        "float32"
+        np.float32
     )
 
-    _, indices = index.search(
+    distances, indices = index.search(
         query_embedding,
-        1
+        2
     )
 
-    return documents[indices[0][0]]
+    results = []
+
+    for distance, index_id in zip(
+        distances[0],
+        indices[0]
+    ):
+        results.append(
+            documents[index_id]
+        )
+
+    return "\n\n".join(results)
 
 
 # ------------------------------------------------------------
-# Clean Model Output
+# Clean LLM Output
 # ------------------------------------------------------------
 def clean_output(text):
 
-    unwanted = [
+    text = text.strip()
+
+    # Remove our prompt's answer marker if generated
+    if "Answer:" in text:
+        text = text.split(
+            "Answer:",
+            1
+        )[-1].strip()
+
+    unwanted_phrases = [
         "Context:",
-        "You are a helpful AI assistant",
-        "Answer:",
-        "Question:",
-        "Use the context only if useful"
+        "You are a helpful AI assistant"
     ]
 
-    for item in unwanted:
-        text = text.replace(item, "")
+    for phrase in unwanted_phrases:
+        text = text.replace(
+            phrase,
+            ""
+        )
+
+    # Stop accidental conversation continuation
+    stop_markers = [
+        "\nUser:",
+        "\nuser:",
+        "\nAssistant:",
+        "\nassistant:"
+    ]
+
+    for marker in stop_markers:
+        if marker in text:
+            text = text.split(
+                marker,
+                1
+            )[0].strip()
 
     return text.strip()
 
 
 # ------------------------------------------------------------
-# Load Resources
+# Generate LLM Response
+# ------------------------------------------------------------
+def generate_answer(
+    prompt,
+    pipe
+):
+
+    result = pipe(
+        prompt
+    )
+
+    generated_text = result[0][
+        "generated_text"
+    ]
+
+    return clean_output(
+        generated_text
+    )
+
+
+# ------------------------------------------------------------
+# Load Models
 # ------------------------------------------------------------
 pipe = load_llm()
 
-embed_model, index, documents = load_rag()
+(
+    embed_model,
+    index,
+    documents
+) = load_rag()
 
 
 # ------------------------------------------------------------
@@ -236,7 +396,9 @@ if "messages" not in st.session_state:
 # ------------------------------------------------------------
 # UI
 # ------------------------------------------------------------
-st.title("🤖 Mini GPT")
+st.title(
+    "🤖 Mini GPT"
+)
 
 st.caption(
     "TinyLlama 1.1B + LoRA + RAG + Multi-Agent Routing"
@@ -244,29 +406,37 @@ st.caption(
 
 
 # ------------------------------------------------------------
-# Display Previous Chat History
+# Display Chat History
 # ------------------------------------------------------------
 for message in st.session_state.messages:
 
-    with st.chat_message(message["role"]):
-
-        st.write(message["content"])
+    with st.chat_message(
+        message["role"]
+    ):
+        st.write(
+            message["content"]
+        )
 
 
 # ------------------------------------------------------------
 # Chat Input
 # ------------------------------------------------------------
-query = st.chat_input("Ask something...")
+query = st.chat_input(
+    "Ask something..."
+)
 
 
-# ------------------------------------------------------------
-# Process New Query
-# ------------------------------------------------------------
 if query:
 
-    # Show the user's question immediately
-    with st.chat_message("user"):
-        st.write(query)
+    # --------------------------------------------------------
+    # Display user's message immediately
+    # --------------------------------------------------------
+    with st.chat_message(
+        "user"
+    ):
+        st.write(
+            query
+        )
 
     # Save user message
     st.session_state.messages.append(
@@ -276,39 +446,40 @@ if query:
         }
     )
 
-
     # --------------------------------------------------------
-    # Keep recent conversation
+    # Conversation Memory
     # --------------------------------------------------------
-    recent_messages = st.session_state.messages[-2:]
-
     conversation = ""
 
-    for message in recent_messages:
-
+    for message in (
+        st.session_state.messages[-5:]
+    ):
         conversation += (
             f"{message['role']}: "
             f"{message['content']}\n"
         )
 
-
     # --------------------------------------------------------
     # Route Query
     # --------------------------------------------------------
-    agent = route_query(query)
+    agent = route_query(
+        query
+    )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # Calculator Agent
-    # --------------------------------------------------------
+    # ========================================================
     if agent == "calculator":
 
-        answer = calculator_tool(query)
+        answer = calculator_tool(
+            query
+        )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # RAG Agent
-    # --------------------------------------------------------
+    # ========================================================
     elif agent == "rag":
 
         context = retrieve(
@@ -318,50 +489,68 @@ if query:
             documents
         )
 
-        prompt = f"""Answer the question briefly.
-
-Context:
-{context}
-
-Question:
-{query}
-
-Answer:"""
-
-        with st.spinner("Thinking..."):
-
-            with torch.inference_mode():
-
-                result = pipe(prompt)
-
-        answer = clean_output(
-            result[0]["generated_text"]
-        )
-
-
-    # --------------------------------------------------------
-    # General LLM Agent
-    # --------------------------------------------------------
-    else:
-
-        prompt = f"""Answer the user briefly and clearly.
+        prompt = f"""
+You are a helpful AI assistant.
 
 Conversation:
 {conversation}
 
-User:
+Use the following retrieved context to answer
+the current question.
+
+Retrieved context:
+{context}
+
+Important instructions:
+- Answer the current question directly.
+- Use the retrieved context when it contains the answer.
+- Do not invent definitions or facts.
+- Do not create a fictional conversation.
+- Do not claim to have access to the internet.
+- If the retrieved context does not contain enough
+  information, say that the information is not
+  available in the current knowledge base.
+
+Question:
 {query}
 
-Assistant:"""
+Answer:
+"""
 
-        with st.spinner("Thinking..."):
+        answer = generate_answer(
+            prompt,
+            pipe
+        )
 
-            with torch.inference_mode():
 
-                result = pipe(prompt)
+    # ========================================================
+    # General LLM Agent
+    # ========================================================
+    else:
 
-        answer = clean_output(
-            result[0]["generated_text"]
+        prompt = f"""
+You are Mini GPT, a helpful AI assistant.
+
+Conversation:
+{conversation}
+
+Answer the current user's question clearly
+and concisely.
+
+Do not invent previous user messages.
+Do not create fictional conversations.
+Do not claim to have internet access or external
+tools unless they are explicitly provided.
+
+Question:
+{query}
+
+Answer:
+"""
+
+        answer = generate_answer(
+            prompt,
+            pipe
         )
 
 
@@ -377,8 +566,11 @@ Assistant:"""
 
 
     # --------------------------------------------------------
-    # Display Assistant Response Immediately
+    # Display Assistant Response
     # --------------------------------------------------------
-    with st.chat_message("assistant"):
-
-        st.write(answer)
+    with st.chat_message(
+        "assistant"
+    ):
+        st.write(
+            answer
+        )

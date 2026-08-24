@@ -1,7 +1,8 @@
 streamlit
+torch
 transformers
 peft
+huggingface-hub
 sentence-transformers
 faiss-cpu
-torch
 numpy

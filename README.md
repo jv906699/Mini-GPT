@@ -34,15 +34,6 @@ Note: The online demo is currently hosted on Streamlit Community Cloud. Because 
 
 https://mini-gpt-wsjad3mp75fpdpsgdapp9ht.streamlit.app/
 
-<!-- Mini-GPT Section Divider -->
-
-<p align="center">
-  <img
-    src="https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=500&size=14&pause=1200&color=64748B&center=true&vCenter=true&repeat=true&width=600&height=28&lines=MODEL+%E2%86%92+RETRIEVAL+%E2%86%92+ROUTING+%E2%86%92+RESPONSE"
-    alt="Mini-GPT pipeline divider"
-  />
-</p>
-
 📌 Project Overview
 
 Mini GPT is an experimental AI assistant designed to demonstrate how modern Large Language Model (LLM) applications can combine multiple AI techniques rather than relying on a language model alone.
@@ -79,24 +70,40 @@ Make the complete system executable locally and deployable as a web application.
 
 The overall system follows this workflow:
 
-<p align="center">
-  <img
-    src="https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=600&size=17&pause=700&color=334155&center=true&vCenter=true&repeat=true&width=760&height=38&lines=USER+QUERY+%E2%86%92+STREAMLIT+UI+%E2%86%92+QUERY+ROUTER;QUERY+ROUTER+%E2%86%92+LLM+AGENT+%7C+RAG+AGENT+%7C+CALCULATOR+AGENT;RAG+AGENT+%E2%86%92+SENTENCE+TRANSFORMER+%E2%86%92+FAISS;RETRIEVED+CONTEXT+%E2%86%92+TINYLLAMA+%2B+LoRA;TINYLLAMA+%2B+LoRA+%E2%86%92+AI+RESPONSE"
-    alt="Animated Mini-GPT system architecture flow"
-  />
-</p>
-
-<p align="center">
-  <kbd>USER QUERY</kbd>
-  &nbsp;&nbsp;→&nbsp;&nbsp;
-  <kbd>QUERY ROUTER</kbd>
-  &nbsp;&nbsp;→&nbsp;&nbsp;
-  <kbd>AI RESPONSE</kbd>
-</p>
-
-<p align="center">
-  <sub>Specialized routing → retrieval when required → grounded generation</sub>
-</p>
+                User Query
+                    │
+                    ▼
+            ┌─────────────────┐
+            │ Streamlit  UI   │
+            └────────┬────────┘
+                     │
+                     ▼
+            ┌─────────────────┐
+            │  Query Router   │
+            └───────┬─────────┘
+                    │
+         ┌──────────┼──────────┐
+         │          │          │
+         ▼          ▼          ▼
+    Calculator     RAG        LLM
+      Agent       Agent      Agent
+         │          │          │
+         │          ▼          │
+         │    Sentence         │
+         │    Transformer      │
+         │          │          │
+         │          ▼          │
+         │       FAISS         │
+         │          │          │
+         │          ▼          │
+         │       Context       │
+         │          │          │
+         └──────────┼──────────┘
+                    ▼
+            Fine-Tuned TinyLlama
+                    │
+                    ▼
+                AI Response
 
 🧩 Technologies Used
 Technology	Purpose
@@ -479,16 +486,16 @@ Assistant: ...
 
 The complete request-processing pipeline is:
 
-          USER
-           │
-           ▼
-     Streamlit UI
-           │
-           ▼
-     Query Router
-           │
-┌──────────┼──────────┐
-▼          ▼          ▼
+              USER
+               │
+               ▼
+         Streamlit UI
+               │
+               ▼
+         Query Router
+               │
+    ┌──────────┼──────────┐
+    ▼          ▼          ▼
 
 Calculator     RAG        LLM
 Agent       Agent      Agent

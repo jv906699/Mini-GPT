@@ -1,4 +1,19 @@
-🤖 Mini GPT — AI Assistant with LLM, RAG & Multi-Agent System
+<p align="center">
+  <img
+    src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:1e293b,100:334155&height=190&section=header&text=MINI-GPT&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=LLM%20%E2%80%A2%20RAG%20%E2%80%A2%20MULTI-AGENT%20AI&descSize=18&descAlignY=58&descColor=ffffff"
+    width="100%"
+    alt="Mini-GPT"
+  />
+</p>
+
+<p align="center">
+  <img
+    src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=17&pause=1000&color=334155&center=true&vCenter=true&repeat=true&width=620&height=30&lines=Fine-tuned+TinyLlama+1.1B;LoRA%2FPEFT+%7C+RAG+%7C+FAISS;Multi-Agent+Query+Routing;An+end-to-end+Generative+AI+application"
+    alt="Mini-GPT technology typing animation"
+  />
+</p>
+
+<br>
 
 A lightweight AI assistant built using a fine-tuned TinyLlama 1.1B language model, LoRA/PEFT, Retrieval-Augmented Generation (RAG), FAISS, and a simple multi-agent architecture. The project combines model fine-tuning, retrieval-based knowledge augmentation, task routing, conversation memory, and an interactive Streamlit interface into a single AI application.
 
@@ -9,7 +24,6 @@ Note: The online demo currently runs on limited cloud resources and may respond 
 Mini GPT interactive interface:
 
 <img width="1919" height="953" alt="image" src="https://github.com/user-attachments/assets/699e99f2-ca1a-4abc-b76b-3a46481b6c88" />
-
 
 🚀 Live Demo
 🌐 Try Mini GPT Online
@@ -56,40 +70,41 @@ Make the complete system executable locally and deployable as a web application.
 
 The overall system follows this workflow:
 
-                    User Query
-                        │
-                        ▼
-                ┌─────────────────┐
-                │ Streamlit  UI   │
-                └────────┬────────┘
-                         │
-                         ▼
-                ┌─────────────────┐
-                │  Query Router   │
-                └───────┬─────────┘
-                        │
-             ┌──────────┼──────────┐
-             │          │          │
-             ▼          ▼          ▼
-        Calculator     RAG        LLM
-          Agent       Agent      Agent
-             │          │          │
-             │          ▼          │
-             │    Sentence         │
-             │    Transformer      │
-             │          │          │
-             │          ▼          │
-             │       FAISS         │
-             │          │          │
-             │          ▼          │
-             │       Context       │
-             │          │          │
-             └──────────┼──────────┘
-                        ▼
-                Fine-Tuned TinyLlama
-                        │
-                        ▼
-                    AI Response
+                User Query
+                    │
+                    ▼
+            ┌─────────────────┐
+            │ Streamlit  UI   │
+            └────────┬────────┘
+                     │
+                     ▼
+            ┌─────────────────┐
+            │  Query Router   │
+            └───────┬─────────┘
+                    │
+         ┌──────────┼──────────┐
+         │          │          │
+         ▼          ▼          ▼
+    Calculator     RAG        LLM
+      Agent       Agent      Agent
+         │          │          │
+         │          ▼          │
+         │    Sentence         │
+         │    Transformer      │
+         │          │          │
+         │          ▼          │
+         │       FAISS         │
+         │          │          │
+         │          ▼          │
+         │       Context       │
+         │          │          │
+         └──────────┼──────────┘
+                    ▼
+            Fine-Tuned TinyLlama
+                    │
+                    ▼
+                AI Response
+
 🧩 Technologies Used
 Technology	Purpose
 Python	Core programming language
@@ -140,8 +155,8 @@ jatin-verma-ai/intelliagent-model
 The application loads the base model first and then attaches the trained LoRA adapter:
 
 model = PeftModel.from_pretrained(
-    model,
-    "jatin-verma-ai/intelliagent-model"
+model,
+"jatin-verma-ai/intelliagent-model"
 )
 
 📊 Training Dataset
@@ -156,7 +171,6 @@ The trained adapter was then uploaded to Hugging Face rather than storing the mo
 
 This keeps the GitHub repository lightweight while allowing the application to download the trained adapter when required.
 
-
 🔄 Retrieval-Augmented Generation (RAG)
 
 Fine-tuning alone does not provide a mechanism for dynamically retrieving external knowledge.
@@ -166,23 +180,23 @@ Therefore, the project also implements Retrieval-Augmented Generation (RAG).
 The RAG pipeline consists of:
 
 User Query
-    │
-    ▼
+│
+▼
 Sentence Transformer
-    │
-    ▼
+│
+▼
 Query Embedding
-    │
-    ▼
+│
+▼
 FAISS Vector Search
-    │
-    ▼
+│
+▼
 Relevant Context
-    │
-    ▼
+│
+▼
 TinyLlama
-    │
-    ▼
+│
+▼
 Generated Answer
 
 🔢 Sentence Transformers
@@ -219,11 +233,11 @@ Instead of sending every user request directly to the language model, Mini GPT i
 
 The system currently contains three logical agents:
 
-1. 🧠 LLM Agent
+🧠 LLM Agent
 
 Handles general questions that do not require a specialized tool or retrieval pipeline.
 
-2. 📚 RAG Agent
+📚 RAG Agent
 
 Handles knowledge-oriented queries such as:
 
@@ -235,7 +249,7 @@ How does...?
 
 The agent retrieves relevant information through SentenceTransformers + FAISS before generating the response.
 
-3. 🧮 Calculator Agent
+🧮 Calculator Agent
 
 Handles basic mathematical queries.
 
@@ -252,15 +266,15 @@ The routing logic determines which agent should process a query.
 Conceptually:
 
 User Query
-     │
-     ▼
+│
+▼
 Query Router
-     │
-     ├── Mathematical query → Calculator Agent
-     │
-     ├── Knowledge query → RAG Agent
-     │
-     └── Other query → LLM Agent
+│
+├── Mathematical query → Calculator Agent
+│
+├── Knowledge query → RAG Agent
+│
+└── Other query → LLM Agent
 
 This demonstrates the basic principle behind tool-using and agent-based AI systems: different tasks can be handled by specialized components instead of forcing a single model to perform every operation.
 
@@ -314,15 +328,15 @@ This prevents Streamlit from unnecessarily loading the LLM and RAG components re
 The LLM loading pipeline is:
 
 TinyLlama
-    ↓
+↓
 Load Tokenizer
-    ↓
+↓
 Load Base Model
-    ↓
+↓
 Load LoRA Adapter
-    ↓
+↓
 Evaluation Mode
-    ↓
+↓
 Transformers Pipeline
 📁 Project Structure
 Mini-GPT/
@@ -334,7 +348,7 @@ Mini-GPT/
 ├── .gitignore
 │
 └── screenshots/
-    └── mini-gpt-interface.png
+└── mini-gpt-interface.png
 app.py
 
 Contains the complete application logic, including:
@@ -427,8 +441,8 @@ jatin-verma-ai/intelliagent-model
 The application automatically loads the adapter through:
 
 PeftModel.from_pretrained(
-    model,
-    "jatin-verma-ai/intelliagent-model"
+model,
+"jatin-verma-ai/intelliagent-model"
 )
 
 Therefore, the trained model files do not need to be stored directly inside the GitHub repository.
@@ -472,42 +486,43 @@ Assistant: ...
 
 The complete request-processing pipeline is:
 
-                  USER
-                   │
-                   ▼
-             Streamlit UI
-                   │
-                   ▼
-             Query Router
-                   │
-        ┌──────────┼──────────┐
-        ▼          ▼          ▼
-   Calculator     RAG        LLM
-     Agent       Agent      Agent
-                  │
-                  ▼
-          SentenceTransformer
-                  │
-                  ▼
-              Embedding
-                  │
-                  ▼
-                FAISS
-                  │
-                  ▼
-           Retrieved Context
-                  │
-                  ▼
-              Prompt
-                  │
-                  ▼
-       TinyLlama + LoRA Adapter
-                  │
-                  ▼
-             AI Response
-                  │
-                  ▼
-          Chat History
+              USER
+               │
+               ▼
+         Streamlit UI
+               │
+               ▼
+         Query Router
+               │
+    ┌──────────┼──────────┐
+    ▼          ▼          ▼
+
+Calculator     RAG        LLM
+Agent       Agent      Agent
+│
+▼
+SentenceTransformer
+│
+▼
+Embedding
+│
+▼
+FAISS
+│
+▼
+Retrieved Context
+│
+▼
+Prompt
+│
+▼
+TinyLlama + LoRA Adapter
+│
+▼
+AI Response
+│
+▼
+Chat History
 📈 Key Features
 ✅ Fine-tuned TinyLlama 1.1B
 ✅ LoRA / PEFT fine-tuning
@@ -562,4 +577,3 @@ Production-grade deployment infrastructure
 Jatin Kumar Verma
 
 B.Tech — Artificial Intelligence
-

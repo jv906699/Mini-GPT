@@ -1,6 +1,6 @@
 <p align="center">
   <img
-    src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:1e293b,100:334155&height=190&section=header&text=MINI-GPT&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=LLM%20%E2%80%A2%20RAG%20%E2%80%A2%20MULTI-AGENT%20AI&descSize=18&descAlignY=58&descColor=ffffff"
+    src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,35:1e293b,65:4f46e5,100:06b6d4&height=220&section=header&text=MINI-GPT&fontSize=54&fontColor=ffffff&animation=fadeIn&fontAlignY=34&desc=FINE-TUNED%20LLM%20%E2%80%A2%20RAG%20%E2%80%A2%20MULTI-AGENT%20AI&descSize=17&descAlignY=57&descColor=ffffff"
     width="100%"
     alt="Mini-GPT"
   />
@@ -8,12 +8,22 @@
 
 <p align="center">
   <img
-    src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=17&pause=1000&color=334155&center=true&vCenter=true&repeat=true&width=620&height=30&lines=Fine-tuned+TinyLlama+1.1B;LoRA%2FPEFT+%7C+RAG+%7C+FAISS;Multi-Agent+Query+Routing;An+end-to-end+Generative+AI+application"
-    alt="Mini-GPT technology typing animation"
+    src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=17&pause=900&color=4F46E5&center=true&vCenter=true&repeat=true&width=760&height=34&lines=Fine-Tuned+TinyLlama+1.1B;LoRA%2FPEFT+%7C+RAG+%7C+FAISS;Multi-Agent+Query+Routing;Retrieval-Augmented+Generation;End-to-End+Generative+AI+Application"
+    alt="Mini-GPT capabilities"
   />
 </p>
 
-<br>
+<p align="center">
+  <kbd>TINYLLAMA 1.1B</kbd>
+  &nbsp;&nbsp;
+  <kbd>LoRA / PEFT</kbd>
+  &nbsp;&nbsp;
+  <kbd>RAG</kbd>
+  &nbsp;&nbsp;
+  <kbd>FAISS</kbd>
+  &nbsp;&nbsp;
+  <kbd>MULTI-AGENT</kbd>
+</p>
 
 A lightweight AI assistant built using a fine-tuned TinyLlama 1.1B language model, LoRA/PEFT, Retrieval-Augmented Generation (RAG), FAISS, and a simple multi-agent architecture. The project combines model fine-tuning, retrieval-based knowledge augmentation, task routing, conversation memory, and an interactive Streamlit interface into a single AI application.
 

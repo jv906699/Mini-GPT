@@ -132,16 +132,29 @@ FAISS	Vector similarity search
 NumPy	Numerical operations
 Streamlit	Interactive web interface
 Hugging Face Hub	Model/adapter hosting
-🤖 Large Language Model
+
+# 🤖 LLM & Fine-Tuning
+
+Mini-GPT is built around **TinyLlama/TinyLlama-1.1B-Chat-v1.0**, a lightweight language model used as the foundation for the application.
+
+<p align="center">
+  <kbd>TINYLLAMA 1.1B</kbd>
+  &nbsp;→&nbsp;
+  <kbd>LoRA</kbd>
+  &nbsp;→&nbsp;
+  <kbd>PEFT ADAPTER</kbd>
+  &nbsp;→&nbsp;
+  <kbd>GENERATIVE AI</kbd>
+</p>
+
+## 🧠 Base Language Model
 
 The project uses:
 
+```text
 TinyLlama/TinyLlama-1.1B-Chat-v1.0
 
-TinyLlama is a lightweight language model containing approximately 1.1 billion parameters and is suitable for experimentation and development on relatively limited hardware.
-
-The base model was not used completely unchanged. A custom LoRA adapter was trained and later loaded on top of the base TinyLlama model.
-
+```
 🎓 Model Fine-Tuning
 Why Fine-Tuning?
 

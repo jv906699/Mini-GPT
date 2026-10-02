@@ -187,19 +187,48 @@ model,
 "jatin-verma-ai/intelliagent-model"
 )
 
-📊 Training Dataset
+# 📊 Training Dataset
 
-The model was fine-tuned using a custom dataset containing approximately 14K training samples.
+The Mini-GPT model was fine-tuned using a **custom dataset containing approximately 14K training samples**.
 
-The dataset was prepared specifically for the Mini GPT project to provide examples suitable for training the language model to generate the desired type of responses.
+The dataset was prepared specifically for the project to provide examples suitable for adapting the language model toward the desired response patterns.
 
-Dataset size: ~14K samples
+## 📦 Dataset Overview
 
-The trained adapter was then uploaded to Hugging Face rather than storing the model weights directly inside the GitHub repository.
+| Property | Details |
+|---|---|
+| 🧾 Dataset Type | Custom fine-tuning dataset |
+| 📊 Training Samples | ~14K |
+| 🤖 Base Model | TinyLlama 1.1B |
+| 🎓 Fine-Tuning Method | LoRA / PEFT |
+| 📦 Output | Trained LoRA Adapter |
 
-This keeps the GitHub repository lightweight while allowing the application to download the trained adapter when required.
+---
 
-🔄 Retrieval-Augmented Generation (RAG)
+## 🔄 Training Flow
+
+<p align="center">
+  <img
+    src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=17&pause=850&color=4F46E5&center=true&vCenter=true&repeat=true&width=760&height=36&lines=CUSTOM+DATASET+%E2%86%92+14K%2B+TRAINING+SAMPLES;TRAINING+DATASET+%E2%86%92+TINYLLAMA+1.1B;TINYLLAMA+%E2%86%92+LoRA%2FPEFT+FINE-TUNING;FINE-TUNING+%E2%86%92+TRAINED+ADAPTER;TRAINED+ADAPTER+%E2%86%92+HUGGING+FACE"
+    alt="Mini-GPT training workflow"
+  />
+</p>
+
+<p align="center">
+  <kbd>DATASET</kbd>
+  &nbsp;→&nbsp;
+  <kbd>TINYLLAMA</kbd>
+  &nbsp;→&nbsp;
+  <kbd>LoRA / PEFT</kbd>
+  &nbsp;→&nbsp;
+  <kbd>ADAPTER</kbd>
+  &nbsp;→&nbsp;
+  <kbd>HUGGING FACE</kbd>
+</p>
+
+---
+
+The trained adapter is hosted separately on Hugging Face rather than being stored directly inside the GitHub repository. This keeps the repository lightweight while allowing the application to retrieve the adapter when required.
 
 Fine-tuning alone does not provide a mechanism for dynamically retrieving external knowledge.
 

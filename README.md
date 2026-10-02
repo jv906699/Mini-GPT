@@ -25,9 +25,25 @@
   <kbd>MULTI-AGENT</kbd>
 </p>
 
-A lightweight AI assistant built using a fine-tuned TinyLlama 1.1B language model, LoRA/PEFT, Retrieval-Augmented Generation (RAG), FAISS, and a simple multi-agent architecture. The project combines model fine-tuning, retrieval-based knowledge augmentation, task routing, conversation memory, and an interactive Streamlit interface into a single AI application.
+# 🧠 What is Mini-GPT?
 
-Note: The online demo currently runs on limited cloud resources and may respond slowly. For the best experience, run the project locally using the instructions provided below.
+**Mini-GPT** is an end-to-end Generative AI application built around a fine-tuned **TinyLlama 1.1B** language model.
+
+The project combines **LoRA/PEFT fine-tuning, Retrieval-Augmented Generation (RAG), FAISS vector search, multi-agent query routing, conversation memory, and Streamlit** into a single interactive AI system.
+
+Rather than relying on a language model alone, Mini-GPT uses specialized components to determine how different types of queries should be processed — from direct LLM responses and knowledge retrieval to mathematical calculations.
+
+<p align="center">
+  <kbd>USER QUERY</kbd>
+  &nbsp;→&nbsp;
+  <kbd>ROUTER</kbd>
+  &nbsp;→&nbsp;
+  <kbd>SPECIALIZED AGENT</kbd>
+  &nbsp;→&nbsp;
+  <kbd>AI RESPONSE</kbd>
+</p>
+
+> **Deployment note:** The online demo runs on limited cloud resources, so response generation may be slower than local execution. The project can also be run locally using the installation instructions below.
 
 📸 Project Preview
 

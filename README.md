@@ -92,44 +92,33 @@ Dynamically route user queries to the appropriate agent.
 Maintain conversation context through chat memory.
 Build an interactive user interface using Streamlit.
 Make the complete system executable locally and deployable as a web application.
-🧠 System Architecture
 
-The overall system follows this workflow:
+# 🧠 System Architecture
 
-                User Query
-                    │
-                    ▼
-            ┌─────────────────┐
-            │ Streamlit  UI   │
-            └────────┬────────┘
-                     │
-                     ▼
-            ┌─────────────────┐
-            │  Query Router   │
-            └───────┬─────────┘
-                    │
-         ┌──────────┼──────────┐
-         │          │          │
-         ▼          ▼          ▼
-    Calculator     RAG        LLM
-      Agent       Agent      Agent
-         │          │          │
-         │          ▼          │
-         │    Sentence         │
-         │    Transformer      │
-         │          │          │
-         │          ▼          │
-         │       FAISS         │
-         │          │          │
-         │          ▼          │
-         │       Context       │
-         │          │          │
-         └──────────┼──────────┘
-                    ▼
-            Fine-Tuned TinyLlama
-                    │
-                    ▼
-                AI Response
+The Mini-GPT architecture combines query routing, specialized agents, retrieval, and fine-tuned generation into a single request-processing pipeline.
+
+<p align="center">
+  <img
+    src="https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=600&size=17&pause=800&color=4F46E5&center=true&vCenter=true&repeat=true&width=800&height=38&lines=USER+QUERY+%E2%86%92+STREAMLIT+UI+%E2%86%92+QUERY+ROUTER;QUERY+ROUTER+%E2%86%92+LLM+AGENT+%7C+RAG+AGENT+%7C+CALCULATOR+AGENT;RAG+AGENT+%E2%86%92+SENTENCE+TRANSFORMER+%E2%86%92+FAISS;FAISS+%E2%86%92+RETRIEVED+CONTEXT+%E2%86%92+TINYLLAMA+%2B+LoRA;TINYLLAMA+%2B+LoRA+%E2%86%92+AI+RESPONSE"
+    alt="Animated Mini-GPT system architecture"
+  />
+</p>
+
+<p align="center">
+  <kbd>USER QUERY</kbd>
+  &nbsp;→&nbsp;
+  <kbd>QUERY ROUTER</kbd>
+  &nbsp;→&nbsp;
+  <kbd>SPECIALIZED AGENT</kbd>
+  &nbsp;→&nbsp;
+  <kbd>AI RESPONSE</kbd>
+</p>
+
+<p align="center">
+  <sub>
+    Specialized routing → retrieval when required → grounded context → fine-tuned generation
+  </sub>
+</p>
 
 🧩 Technologies Used
 Technology	Purpose

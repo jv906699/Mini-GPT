@@ -500,6 +500,8 @@ LLM Agent     RAG Agent    Calculator Agent
           Chat History
 
 Rather than building only a chatbot interface, the project combines model adaptation, retrieval, routing, tools, memory, and UI into a single end-to-end AI application.
+
+``` 
 🔮 Future Improvements
 Potential improvements include:
 - More sophisticated agent orchestration

@@ -428,48 +428,7 @@ User: How does it learn?
 
 Assistant: ...
 Context: Stored conversation history
-🔬 Technical Workflow
-The complete request-processing pipeline can be represented as:
-                         USER
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │ Streamlit UI│
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │ Query Router│
-                    └──────┬──────┘
-                           │
-             ┌─────────────┼─────────────┐
-             ▼             ▼             ▼
-        Calculator        RAG           LLM
-          Agent          Agent         Agent
-                          │
-                          ▼
-                 SentenceTransformer
-                          │
-                          ▼
-                      Embedding
-                          │
-                          ▼
-                         FAISS
-                          │
-                          ▼
-                  Retrieved Context
-                          │
-                          ▼
-                        Prompt
-                          │
-                          ▼
-                 TinyLlama + LoRA
-                          │
-                          ▼
-                     AI Response
-                          │
-                          ▼
-                    Chat History
+
 📈 Key Features
 - ✅ Fine-tuned TinyLlama 1.1B
 - ✅ LoRA / PEFT fine-tuning
@@ -499,6 +458,46 @@ Area	Implementation
 ☁️ Model Hosting	Hugging Face Hub
 🚀 Deployment	Local + Streamlit Community Cloud
 
+# 🔬 Technical Workflow
+
+The following workflow shows how a request moves through Mini-GPT from the user interface to the final response.
+
+```text
+USER
+  │
+  ▼
+Streamlit UI
+  │
+  ▼
+Query Router
+  │
+  ├──────────────┬──────────────┐
+  ▼              ▼              ▼
+LLM Agent     RAG Agent    Calculator Agent
+                 │
+                 ▼
+        SentenceTransformer
+                 │
+                 ▼
+              Embedding
+                 │
+                 ▼
+               FAISS
+                 │
+                 ▼
+        Retrieved Context
+                 │
+                 ▼
+              Prompt
+                 │
+                 ▼
+        TinyLlama + LoRA
+                 │
+                 ▼
+           AI Response
+                 │
+                 ▼
+          Chat History
 
 Rather than building only a chatbot interface, the project combines model adaptation, retrieval, routing, tools, memory, and UI into a single end-to-end AI application.
 🔮 Future Improvements

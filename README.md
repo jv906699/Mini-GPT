@@ -429,20 +429,20 @@ User: How does it learn?
 Assistant: ...
 Context: Stored conversation history
 
-📈 Key Features
-- ✅ Fine-tuned TinyLlama 1.1B
-- ✅ LoRA / PEFT fine-tuning
-- ✅ Custom ~14K-sample dataset
-- ✅ Retrieval-Augmented Generation
-- ✅ SentenceTransformer embeddings
-- ✅ FAISS vector search
-- ✅ Multi-agent query routing
-- ✅ Calculator tool
-- ✅ Conversation memory
-- ✅ Streamlit interactive UI
-- ✅ Hugging Face model hosting
-- ✅ Local execution
-- ✅ Online demonstration
+# 📈 Key Features
+
+| Feature | Implementation |
+|---|---|
+| 🤖 Fine-Tuned LLM | TinyLlama 1.1B with LoRA / PEFT |
+| 📚 RAG | SentenceTransformers + FAISS retrieval |
+| 🤝 Multi-Agent Routing | LLM, RAG, and Calculator agents |
+| 🧮 Calculator | Direct handling of basic mathematical queries |
+| 💬 Conversation Memory | Streamlit session-based chat history |
+| 🖥️ Interactive UI | Streamlit chat interface |
+| ☁️ Model Hosting | LoRA adapter hosted on Hugging Face |
+| 💻 Local Execution | Run the complete application locally |
+| 🌐 Online Demo | Streamlit Community Cloud deployment |
+
 🧠 What This Project Demonstrates
 Mini-GPT demonstrates practical implementation of several components used in modern Generative AI applications:
 Area	Implementation

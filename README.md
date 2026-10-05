@@ -444,19 +444,41 @@ Context: Stored conversation history
 | 🌐 Online Demo | Streamlit Community Cloud deployment |
 
 🧠 What This Project Demonstrates
-Mini-GPT demonstrates practical implementation of several components used in modern Generative AI applications:
-Area	Implementation
-🤖 Large Language Models	TinyLlama 1.1B
-🎓 Parameter-Efficient Fine-Tuning	LoRA / PEFT
-📚 Retrieval-Augmented Generation	SentenceTransformers + FAISS
-🔎 Vector Similarity Search	FAISS IndexFlatL2
-🧠 Embeddings	all-MiniLM-L6-v2
-🤝 Agent-Based Task Routing	LLM / RAG / Calculator agents
-🧮 Tool Integration	Calculator agent
-💬 Conversation Memory	Streamlit st.session_state
-🖥️ LLM Application Development	Streamlit
-☁️ Model Hosting	Hugging Face Hub
-🚀 Deployment	Local + Streamlit Community Cloud
+# 🧠 What This Project Demonstrates
+
+Mini-GPT brings together several practical components used in modern Generative AI application development.
+
+<p align="center">
+  <kbd>LLMs</kbd>
+  &nbsp;→&nbsp;
+  <kbd>FINE-TUNING</kbd>
+  &nbsp;→&nbsp;
+  <kbd>RAG</kbd>
+  &nbsp;→&nbsp;
+  <kbd>AGENTS</kbd>
+  &nbsp;→&nbsp;
+  <kbd>TOOLS</kbd>
+  &nbsp;→&nbsp;
+  <kbd>MEMORY</kbd>
+  &nbsp;→&nbsp;
+  <kbd>DEPLOYMENT</kbd>
+</p>
+
+| Area | Implementation |
+|---|---|
+| **Large Language Models** | TinyLlama 1.1B |
+| **Parameter-Efficient Fine-Tuning** | LoRA / PEFT |
+| **Retrieval-Augmented Generation** | SentenceTransformers + FAISS |
+| **Vector Search** | FAISS `IndexFlatL2` |
+| **Embeddings** | `all-MiniLM-L6-v2` |
+| **Agent-Based Routing** | LLM / RAG / Calculator agents |
+| **Tool Integration** | Calculator agent |
+| **Conversation Memory** | Streamlit `st.session_state` |
+| **LLM Application Development** | Streamlit |
+| **Model Hosting** | Hugging Face Hub |
+| **Deployment** | Local + Streamlit Community Cloud |
+
+The project demonstrates how model adaptation, retrieval, task routing, tools, conversation context, and an interactive interface can be combined into a single end-to-end Generative AI application.
 
 # 🔬 Technical Workflow
 
